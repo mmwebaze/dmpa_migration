@@ -1,0 +1,73 @@
+## Migration configuration for node types
+id: dmpa_nodes
+label: Creates Dmpa nodes from csv file
+migration_group: dmpa
+source:
+  plugin: csv
+  path: 'modules/custom/dmpa_migration/assets/csv/dmpa_data.csv'
+  delimiter: ','
+  enclosure: '"'
+  header_row_count: 1
+  keys:
+    - id
+  column_names:
+    -
+      id: id
+    -
+      title: 'Title of node'
+    -
+      country_id: 'Country id'
+    -
+      program_id: 'Program id'
+    -
+      soh: 'Date SOH Updated'
+    -
+      month: 'Month'
+    -
+      year: 'Year'
+    -
+      mos: 'Months of stock'
+    -
+      qty_hand: 'Quantity on hand'
+    -
+      amc: 'Average monthly consumption'
+    -
+      min: 'Min'
+    -
+      max: 'Max'
+
+destination:
+  plugin: entity:node
+process:
+  type:
+    plugin: default_value
+    default_value: supply_chain_data
+  uid:
+    plugin: default_value
+    default_value: 1
+  langcode:
+    plugin: default_value
+    default_value: en
+  created:
+    -
+      plugin: skip_on_empty
+      method: row
+      source: soh
+      message: 'Field missing data'
+    -
+      plugin: supply_chain_data_soh
+      #source: soh
+  title: title
+  field_amcs/value: amc
+  field_country/target_id: country_id
+  field_estimated_quantity_on_hand/value: qty_hand
+  field_max/value: max
+  field_min/value: min
+  field_month/target_id: month
+  field_months_of_stock/value: mos
+  field_program/target_id: program_id
+  field_year/target_id: year
+dependencies:
+  enforced:
+    module:
+      - dmpa_migration
